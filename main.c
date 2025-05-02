@@ -31,7 +31,7 @@ int main() {
                 return 0;
             case 1: {
                 int new_id = find_next_id(lists);
-                if (new_id >= 10) {
+                if (new_id == -1) {
                     printf("Слишком много списков (10).\n");
                     break;
                 }
@@ -60,6 +60,7 @@ int main() {
                 }
                 
                 lists[new_id].current = new_node;
+                lists[new_id].exists = 1;
                 active_list_id = new_id;
                 free(data);
                 break;
@@ -73,8 +74,8 @@ int main() {
                     break;
                 }
                 int to_id = find_next_id(lists);
-                if (to_id >= 10) {
-                    printf("ДСлишком много списков (10).\n");
+                if (to_id == -1) {
+                    printf("Слишком много списков (10).\n");
                     break;
                 }
                 copy_list(lists, from_id, to_id);

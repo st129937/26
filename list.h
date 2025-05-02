@@ -9,6 +9,7 @@ typedef struct Node {
 
 typedef struct {
     Node* current;
+    int exists;
 } List;
 
 //Ввод элементов списка

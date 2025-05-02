@@ -21,21 +21,18 @@ Node* create_node(int data) {
 }
 
 int find_next_id(List lists[]) {
-    int max_id = -1;
     for (int i = 0; i < 10; i++) {
-        if (lists[i].current != NULL && i > max_id) {
-            max_id = i;
+        if (!lists[i].exists) {
+            return i;
         }
     }
-    return max_id + 1;
+    return -1;
 }
 
+
 void create_empty_node(List lists[], int id) {
-    Node* empty = malloc(sizeof(Node));
-    empty->data = 0;
-    empty->next = empty;
-    empty->prev = empty;
-    lists[id].current = empty;
+    lists[id].current = NULL;
+    lists[id].exists = 1;
 }
 
 void copy_list(List lists[], int from_id, int to_id) {
@@ -74,33 +71,49 @@ void switch_active_list(List lists[], int* active_list_id, int new_id) {
 
 void insert_after(List lists[], int active_list_id) {
     Node* curr = lists[active_list_id].current;
-    if (!curr) return;
 
     int data;
     printf("Значение для вставки после текущего: ");
     scanf("%d", &data);
 
     Node* new_node = create_node(data);
+
+    if (!curr) {
+        new_node->next = new_node;
+        new_node->prev = new_node;
+        lists[active_list_id].current = new_node;
+        return;
+    }
+
     new_node->next = curr->next;
     new_node->prev = curr;
     curr->next->prev = new_node;
     curr->next = new_node;
 }
 
+
 void insert_before(List lists[], int active_list_id) {
     Node* curr = lists[active_list_id].current;
-    if (!curr) return;
 
     int data;
     printf("Значение для вставки перед текущим: ");
     scanf("%d", &data);
 
     Node* new_node = create_node(data);
+
+    if (!curr) {
+        new_node->next = new_node;
+        new_node->prev = new_node;
+        lists[active_list_id].current = new_node;
+        return;
+    }
+
     new_node->prev = curr->prev;
     new_node->next = curr;
     curr->prev->next = new_node;
     curr->prev = new_node;
 }
+
 
 void delete_current(List lists[], int active_list_id) {
     Node* curr = lists[active_list_id].current;
@@ -132,17 +145,18 @@ void go_back(List lists[], int active_list_id) {
 void print_all_lists(List lists[], int active_list_id) {
     printf("\n==== Списки ====\n");
     for (int i = 0; i < 10; i++) {
+        if (!lists[i].exists) continue;
+    
         Node* current = lists[i].current;
-        if (!current) continue; 
-
+    
         if (i == active_list_id) printf(">%d: ", i);
         else printf(" %d: ", i);
-
-        if (current->next == current && current->prev == current && current->data == 0) {
+    
+        if (!current) {
             printf("(пусто)\n");
             continue;
         }
-
+    
         Node* start = current;
         Node* iter = start;
         do {
@@ -152,6 +166,7 @@ void print_all_lists(List lists[], int active_list_id) {
         } while (iter != start);
         printf("\n");
     }
+    
     printf("================\n");
 }
 
@@ -168,5 +183,6 @@ void free_all_lists(List lists[]) {
         }
         free(start);
         lists[i].current = NULL;
+        lists[i].exists = 0;
     }
 }
